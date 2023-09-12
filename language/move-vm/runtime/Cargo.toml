@@ -40,3 +40,6 @@ debugging = []
 testing = []
 stacktrace = []
 lazy_natives = []
+#
+#[dependencies.address]
+#path = "../move-analyzer"

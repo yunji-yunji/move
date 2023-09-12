@@ -49,7 +49,8 @@ impl AccountDataCache {
 /// The Move VM takes a `DataStore` in input and this is the default and correct implementation
 /// for a data store related to a transaction. Clients should create an instance of this type
 /// and pass it to the Move VM.
-pub(crate) struct TransactionDataCache<'r, 'l, S> {
+pub struct TransactionDataCache<'r, 'l, S> {
+    // pub(crate) struct TransactionDataCache<'r, 'l, S> {
     remote: &'r S,
     loader: &'l Loader,
     account_map: BTreeMap<AccountAddress, AccountDataCache>,
@@ -59,7 +60,8 @@ pub(crate) struct TransactionDataCache<'r, 'l, S> {
 impl<'r, 'l, S: MoveResolver> TransactionDataCache<'r, 'l, S> {
     /// Create a `TransactionDataCache` with a `RemoteCache` that provides access to data
     /// not updated in the transaction.
-    pub(crate) fn new(remote: &'r S, loader: &'l Loader) -> Self {
+    // yunji edit
+    pub fn new(remote: &'r S, loader: &'l Loader) -> Self {
         TransactionDataCache {
             remote,
             loader,

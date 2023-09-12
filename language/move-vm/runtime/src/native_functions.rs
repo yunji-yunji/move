@@ -57,7 +57,8 @@ pub fn make_table_from_iter<S: Into<Box<str>>>(
         .collect()
 }
 
-pub(crate) struct NativeFunctions(
+// yunji edit
+pub struct NativeFunctions(
     HashMap<AccountAddress, HashMap<String, HashMap<String, NativeFunction>>>,
 );
 

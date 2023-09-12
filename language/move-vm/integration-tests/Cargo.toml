@@ -25,6 +25,11 @@ move-vm-types = { path = "../types" }
 move-vm-test-utils = { path = "../test-utils" }
 move-stdlib = { path = "../../move-stdlib" }
 move-table-extension = { path = "../../extensions/move-table-extension", optional = true }
+# yunji add
+serde = { version="1.0", features = ["derive"] }
+
+[dependencies.fuzzcheck]
+path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
 
 [features]
 default = []
@@ -33,6 +38,11 @@ table-extension = [
     "move-vm-test-utils/table-extension"
 ]
 
-[[bin]]
-name = "instantiation"
-path = "src/tests/instantiation_tests.rs"
+[lib]
+name = "yj"
+path = "src/lib.rs"
+
+# yj added
+#[[bin]]
+#name = "instantiation"
+#path = "src/tests/instantiation_tests.rs"

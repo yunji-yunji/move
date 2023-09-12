@@ -29,6 +29,35 @@ move-ir-types = { path = "../move-ir/types" }
 move-package = { path = "../tools/move-package" }
 move-symbol-pool = { path = "../move-symbol-pool" }
 
+# yunji add =====================
+hex = "0.4.3"
+rand = "0.8.3"
+memory-stats = "1.0.0"
+parking_lot = "0.11.1"
+sha3 = "0.9.1"
+
+move-core-types = {path = "../move-core/types" }
+move-binary-format = { path = "../move-binary-format" }
+move-bytecode-verifier = { path = "../move-bytecode-verifier" }
+
+move-vm-runtime = { path = "../move-vm/runtime" }
+move-vm-types = { path = "../move-vm/types" }
+move-vm-test-utils = { path = "../move-vm/test-utils" }
+move-stdlib = { path = "../move-stdlib" }
+move-table-extension = { path = "../extensions/move-table-extension", optional = true }
+
+#move-compiler = { path = "../move-compiler" }
+#serde = { version="1.0", features = ["derive"] }
+tracing = "0.1.26"
+
+[dependencies.fuzzcheck]
+path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+# yunji add ===================
+
 [features]
 address20 = ["move-compiler/address20"]
 address32 = ["move-compiler/address32"]
+
+#[[bin]]
+#name="address"
+#paht = "src/bin/yj_main3.rs"

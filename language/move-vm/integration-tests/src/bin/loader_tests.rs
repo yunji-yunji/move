@@ -1,8 +1,24 @@
+#![feature(no_coverage)]
+
+use fuzzcheck::mutators::testing_utilities::test_mutator;
+// move-vm-integration-tests
+// use crate::compiler::*;
+// use yj::tests::loader_tests::Adapter;
+// use yj::loader_tests::Adapter;
+// // use move_vm_integration_tests::yjtests::loader_tests::Adapter;
+// // use crate::tests::loader_tests::Adapter;
+// // use crate::tests::loader_tests::Adapter;
+// // use move_vm::tests::loader_tests::Adapter;
+//
+
+
+
+
 // Copyright (c) The Diem Core Contributors
 // Copyright (c) The Move Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::compiler::compile_modules_in_file;
+use move_vm_integration_tests::compiler::compile_modules_in_file;
 use move_binary_format::{
     file_format::{
         empty_module, AddressIdentifierIndex, IdentifierIndex, ModuleHandle, TableIndex,
@@ -27,10 +43,10 @@ use serde::{Deserialize, Serialize};
 
 const WORKING_ACCOUNT: AccountAddress = AccountAddress::TWO;
 
-// #[derive(DefaultMutator)]
+#[derive(DefaultMutator)]
 // #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Copy)]
-// #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Clone)]
-// #[derive(Serialize, Deserialize)]
+#[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Clone)]
+#[derive(Serialize, Deserialize)]
 pub struct Adapter {
     store: InMemoryStorage,
     vm: Arc<MoveVM>,
@@ -538,3 +554,9 @@ fn empty_module_with_friends(name: String, deps: Vec<String>) -> CompiledModule 
     }
     module
 }
+
+
+fn main() {
+    println!("test Loader_tests");
+}
+

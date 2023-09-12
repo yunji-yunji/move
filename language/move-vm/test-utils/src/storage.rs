@@ -119,16 +119,21 @@ impl<'a, 'b, S: MoveResolver> DeltaStorage<'a, 'b, S> {
         Self { base, delta }
     }
 }
+use fuzzcheck::DefaultMutator;
+
 
 /// Simple in-memory storage for modules and resources under an account.
 #[derive(Debug, Clone)]
+#[derive(DefaultMutator)]
+// #[derive(Copy)]
 struct InMemoryAccountStorage {
     resources: BTreeMap<StructTag, Vec<u8>>,
     modules: BTreeMap<Identifier, Vec<u8>>,
 }
-
+#[derive(DefaultMutator)]
 /// Simple in-memory storage that can be used as a Move VM storage backend for testing purposes.
 #[derive(Debug, Clone)]
+// #[derive(Copy)]
 pub struct InMemoryStorage {
     accounts: BTreeMap<AccountAddress, InMemoryAccountStorage>,
     #[cfg(feature = "table-extension")]

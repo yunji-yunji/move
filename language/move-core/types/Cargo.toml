@@ -17,15 +17,28 @@ proptest = { version = "1.0.0", default-features = false, optional = true }
 proptest-derive = { version = "0.3.0", default-features = false, optional = true }
 rand = "0.8.3"
 ref-cast = "1.0.6"
-serde = { version = "1.0.124", default-features = false }
+#serde = { version = "1.0.124", default-features = false }
+serde = { version = "1.0.124", default-features = false, features = ["derive"]}
+#serde = { version = "1.0", features = ["derive"] }
 serde_bytes = "0.11.5"
 primitive-types = {version = "0.10.1", features = ["impl-serde"]}
 uint = "0.9.4"
 num = "0.4.0"
 ethnum = "1.0.4"
 arbitrary = { version = "1.1.7", features = [ "derive_arbitrary"], optional = true }
+#move-stdlib = { path = "../../move-stdlib" }
+#move-vm-runtime = { path = "../../../move-vm/runtime" }
+#move-vm-types = { path = "../../move-vm/types" }
+#move-vm-test-utils = { path = "../../move-vm/test-utils" }
+#move-vm-runtime = { path = "../../move-vm/runtime"}
+
+
 
 bcs.workspace = true
+#move-analyzer = { path = "../move-analyzer" }
+
+[dependencies.fuzzcheck]
+path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
 
 [dev-dependencies]
 proptest = "1.0.0"
@@ -39,3 +52,4 @@ address20 = []
 address32 = []
 default = []
 fuzzing = ["proptest", "proptest-derive", "arbitrary"]
+#fuzzing = ["no_coverage"]

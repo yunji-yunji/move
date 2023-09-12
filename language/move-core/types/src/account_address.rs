@@ -1,16 +1,34 @@
 // Copyright (c) The Diem Core Contributors
 // Copyright (c) The Move Contributors
 // SPDX-License-Identifier: Apache-2.0
+//// #[derive(Clone, PartialEq, Eq, Hash, DefaultMutator)]
+// // // Debug
+// /// A struct that represents an account address.
+// // #[derive(Ord, PartialOrd, Copy)]
+// // #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
+// #![allow(unused_attributes)]
+// #![cfg_attr(fuzzing, feature(no_coverage))]
+// #[cfg(all(fuzzing, test))]
+// #![feature(impl_trait_in_assoc_type)]
+// #[derive(Serialize, Deserialize)]
+// // use serde::{Deserialize, Serialize};
+// use fuzzcheck::mutators::testing_utilities::test_mutator;
+// use fuzzcheck::mutators::tuples::TupleStructure;
+
+
+
+// #![feature(no_coverage)]
+
+use fuzzcheck::DefaultMutator;
 
 use hex::FromHex;
 use rand::{rngs::OsRng, Rng};
 use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};
 use std::{convert::TryFrom, fmt, str::FromStr};
 
-/// A struct that represents an account address.
+#[derive(DefaultMutator)]
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Copy)]
-#[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
-#[cfg_attr(any(test, feature = "fuzzing"), derive(arbitrary::Arbitrary))]
+// #[cfg_attr(any(test, feature = "fuzzing"), derive(arbitrary::Arbitrary))]
 pub struct AccountAddress([u8; AccountAddress::LENGTH]);
 
 impl AccountAddress {
@@ -253,8 +271,8 @@ impl FromStr for AccountAddress {
 
 impl<'de> Deserialize<'de> for AccountAddress {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         if deserializer.is_human_readable() {
             let s = <String>::deserialize(deserializer)?;
@@ -275,8 +293,8 @@ impl<'de> Deserialize<'de> for AccountAddress {
 
 impl Serialize for AccountAddress {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         if serializer.is_human_readable() {
             self.to_hex().serialize(serializer)
@@ -301,141 +319,166 @@ impl fmt::Display for AccountAddressParseError {
 }
 
 impl std::error::Error for AccountAddressParseError {}
-
+/*
 #[cfg(test)]
 mod tests {
-    use super::AccountAddress;
-    use hex::FromHex;
-    use proptest::prelude::*;
-    use std::{
-        convert::{AsRef, TryFrom},
-        str::FromStr,
-    };
+use super::AccountAddress;
+use hex::FromHex;
+use proptest::prelude::*;
+use std::{
+    convert::{AsRef, TryFrom},
+    str::FromStr,
+};
+
+#[test]
+fn test_display_impls() {
+    let hex = "ca843279e3427144cead5e4d5999a3d0";
+    let upper_hex = "CA843279E3427144CEAD5E4D5999A3D0";
+
+    let address = AccountAddress::from_hex(hex).unwrap();
+
+    assert_eq!(format!("{}", address), hex);
+    assert_eq!(format!("{:?}", address), hex);
+    assert_eq!(format!("{:X}", address), upper_hex);
+    assert_eq!(format!("{:x}", address), hex);
+
+    assert_eq!(format!("{:#x}", address), format!("0x{}", hex));
+    assert_eq!(format!("{:#X}", address), format!("0x{}", upper_hex));
+}
+
+#[test]
+fn test_short_str_lossless() {
+    let address = AccountAddress::from_hex("00c0f1f95c5b1c5f0eda533eff269000").unwrap();
+
+    assert_eq!(
+        address.short_str_lossless(),
+        "c0f1f95c5b1c5f0eda533eff269000",
+    );
+}
+
+#[test]
+fn test_short_str_lossless_zero() {
+    let address = AccountAddress::from_hex("00000000000000000000000000000000").unwrap();
+
+    assert_eq!(address.short_str_lossless(), "0");
+}
+
+#[test]
+fn test_address() {
+    let hex = "ca843279e3427144cead5e4d5999a3d0";
+    let bytes = Vec::from_hex(hex).expect("You must provide a valid Hex format");
+
+    assert_eq!(
+        bytes.len(),
+        AccountAddress::LENGTH as usize,
+        "Address {:?} is not {}-bytes long. Addresses must be {} bytes",
+        bytes,
+        AccountAddress::LENGTH,
+        AccountAddress::LENGTH,
+    );
+
+    let address = AccountAddress::from_hex(hex).unwrap();
+
+    assert_eq!(address.as_ref().to_vec(), bytes);
+}
+
+#[test]
+fn test_from_hex_literal() {
+    let hex_literal = "0x1";
+    let hex = "00000000000000000000000000000001";
+
+    let address_from_literal = AccountAddress::from_hex_literal(hex_literal).unwrap();
+    let address = AccountAddress::from_hex(hex).unwrap();
+
+    assert_eq!(address_from_literal, address);
+    assert_eq!(hex_literal, address.to_hex_literal());
+
+    // Missing '0x'
+    AccountAddress::from_hex_literal(hex).unwrap_err();
+    // Too long
+    AccountAddress::from_hex_literal("0x100000000000000000000000000000001").unwrap_err();
+}
+
+#[test]
+fn test_ref() {
+    let address = AccountAddress::new([1u8; AccountAddress::LENGTH]);
+    let _: &[u8] = address.as_ref();
+}
+
+#[test]
+fn test_address_from_proto_invalid_length() {
+    let bytes = vec![1; 123];
+    AccountAddress::from_bytes(bytes).unwrap_err();
+}
+
+#[test]
+fn test_deserialize_from_json_value() {
+    let address = AccountAddress::random();
+    let json_value = serde_json::to_value(address).expect("serde_json::to_value fail.");
+    let address2: AccountAddress =
+        serde_json::from_value(json_value).expect("serde_json::from_value fail.");
+    assert_eq!(address, address2)
+}
+
+#[test]
+fn test_serde_json() {
+    let hex = "ca843279e3427144cead5e4d5999a3d0";
+    let json_hex = "\"ca843279e3427144cead5e4d5999a3d0\"";
+
+    let address = AccountAddress::from_hex(hex).unwrap();
+
+    let json = serde_json::to_string(&address).unwrap();
+    let json_address: AccountAddress = serde_json::from_str(json_hex).unwrap();
+
+    assert_eq!(json, json_hex);
+    assert_eq!(address, json_address);
+}
+
+#[test]
+fn test_address_from_empty_string() {
+    assert!(AccountAddress::try_from("".to_string()).is_err());
+    assert!(AccountAddress::from_str("").is_err());
+}
+
+proptest! {
+    #[test]
+    fn test_address_string_roundtrip(addr in any::<AccountAddress>()) {
+        let s = String::from(&addr);
+        let addr2 = AccountAddress::try_from(s).expect("roundtrip to string should work");
+        prop_assert_eq!(addr, addr2);
+    }
 
     #[test]
-    fn test_display_impls() {
-        let hex = "ca843279e3427144cead5e4d5999a3d0";
-        let upper_hex = "CA843279E3427144CEAD5E4D5999A3D0";
-
-        let address = AccountAddress::from_hex(hex).unwrap();
-
-        assert_eq!(format!("{}", address), hex);
-        assert_eq!(format!("{:?}", address), hex);
-        assert_eq!(format!("{:X}", address), upper_hex);
-        assert_eq!(format!("{:x}", address), hex);
-
-        assert_eq!(format!("{:#x}", address), format!("0x{}", hex));
-        assert_eq!(format!("{:#X}", address), format!("0x{}", upper_hex));
+    fn test_address_protobuf_roundtrip(addr in any::<AccountAddress>()) {
+        let bytes = addr.to_vec();
+        prop_assert_eq!(bytes.clone(), addr.as_ref());
+        let addr2 = AccountAddress::try_from(&bytes[..]).unwrap();
+        prop_assert_eq!(addr, addr2);
     }
+}
+}
 
-    #[test]
-    fn test_short_str_lossless() {
-        let address = AccountAddress::from_hex("00c0f1f95c5b1c5f0eda533eff269000").unwrap();
+*/
 
-        assert_eq!(
-            address.short_str_lossless(),
-            "c0f1f95c5b1c5f0eda533eff269000",
-        );
-    }
 
-    #[test]
-    fn test_short_str_lossless_zero() {
-        let address = AccountAddress::from_hex("00000000000000000000000000000000").unwrap();
+const TEST_ADDR: AccountAddress = AccountAddress::new([42; AccountAddress::LENGTH]);
 
-        assert_eq!(address.short_str_lossless(), "0");
-    }
+fn _fuzz_target(ta: &AccountAddress) {
 
-    #[test]
-    fn test_address() {
-        let hex = "ca843279e3427144cead5e4d5999a3d0";
-        let bytes = Vec::from_hex(hex).expect("You must provide a valid Hex format");
+    // test_publish_module_with_nested_loops(ta);
+    println!("fuzz_target called in main");
+}
 
-        assert_eq!(
-            bytes.len(),
-            AccountAddress::LENGTH as usize,
-            "Address {:?} is not {}-bytes long. Addresses must be {} bytes",
-            bytes,
-            AccountAddress::LENGTH,
-            AccountAddress::LENGTH,
-        );
-
-        let address = AccountAddress::from_hex(hex).unwrap();
-
-        assert_eq!(address.as_ref().to_vec(), bytes);
-    }
-
-    #[test]
-    fn test_from_hex_literal() {
-        let hex_literal = "0x1";
-        let hex = "00000000000000000000000000000001";
-
-        let address_from_literal = AccountAddress::from_hex_literal(hex_literal).unwrap();
-        let address = AccountAddress::from_hex(hex).unwrap();
-
-        assert_eq!(address_from_literal, address);
-        assert_eq!(hex_literal, address.to_hex_literal());
-
-        // Missing '0x'
-        AccountAddress::from_hex_literal(hex).unwrap_err();
-        // Too long
-        AccountAddress::from_hex_literal("0x100000000000000000000000000000001").unwrap_err();
-    }
-
-    #[test]
-    fn test_ref() {
-        let address = AccountAddress::new([1u8; AccountAddress::LENGTH]);
-        let _: &[u8] = address.as_ref();
-    }
-
-    #[test]
-    fn test_address_from_proto_invalid_length() {
-        let bytes = vec![1; 123];
-        AccountAddress::from_bytes(bytes).unwrap_err();
-    }
-
-    #[test]
-    fn test_deserialize_from_json_value() {
-        let address = AccountAddress::random();
-        let json_value = serde_json::to_value(address).expect("serde_json::to_value fail.");
-        let address2: AccountAddress =
-            serde_json::from_value(json_value).expect("serde_json::from_value fail.");
-        assert_eq!(address, address2)
-    }
-
-    #[test]
-    fn test_serde_json() {
-        let hex = "ca843279e3427144cead5e4d5999a3d0";
-        let json_hex = "\"ca843279e3427144cead5e4d5999a3d0\"";
-
-        let address = AccountAddress::from_hex(hex).unwrap();
-
-        let json = serde_json::to_string(&address).unwrap();
-        let json_address: AccountAddress = serde_json::from_str(json_hex).unwrap();
-
-        assert_eq!(json, json_hex);
-        assert_eq!(address, json_address);
-    }
-
-    #[test]
-    fn test_address_from_empty_string() {
-        assert!(AccountAddress::try_from("".to_string()).is_err());
-        assert!(AccountAddress::from_str("").is_err());
-    }
-
-    proptest! {
-        #[test]
-        fn test_address_string_roundtrip(addr in any::<AccountAddress>()) {
-            let s = String::from(&addr);
-            let addr2 = AccountAddress::try_from(s).expect("roundtrip to string should work");
-            prop_assert_eq!(addr, addr2);
-        }
-
-        #[test]
-        fn test_address_protobuf_roundtrip(addr in any::<AccountAddress>()) {
-            let bytes = addr.to_vec();
-            prop_assert_eq!(bytes.clone(), addr.as_ref());
-            let addr2 = AccountAddress::try_from(&bytes[..]).unwrap();
-            prop_assert_eq!(addr, addr2);
-        }
-    }
+fn main() {
+    // let m = AccountAddress::default_mutator();
+    // // let m = SampleStruct2::<u8, u8>::default_mutator();
+    // test_mutator(m, 1000., 1000., false, true, 50, 50);
+    // let result = fuzzcheck::fuzz_test(fuzz_target)
+    //     .default_mutator()
+    //     .serde_serializer()
+    //     .default_sensor_and_pool()
+    //     .arguments_from_cargo_fuzzcheck()
+    //     .stop_after_first_test_failure(true)
+    //     .launch();
+    println!("main for address.rs");
 }

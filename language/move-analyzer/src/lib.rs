@@ -11,3 +11,8 @@ pub mod diagnostics;
 pub mod symbols;
 pub mod utils;
 pub mod vfs;
+
+// yunji add
+pub mod compiler;
+// pub mod address;
+// pub mod yj_main3;

@@ -17,6 +17,7 @@ use move_core_types::{
     metadata::Metadata, resolver::MoveResolver,
 };
 
+// #[derive(Copy)]
 pub struct MoveVM {
     runtime: VMRuntime,
 }

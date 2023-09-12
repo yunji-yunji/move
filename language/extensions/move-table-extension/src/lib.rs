@@ -1,6 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // Copyright (c) The Move Contributors
 // SPDX-License-Identifier: Apache-2.0
+#![feature(no_coverage)]
 
 //! A crate which extends Move by tables.
 //!
@@ -39,6 +40,9 @@ use std::{
 // ===========================================================================================
 // Public Data Structures and Constants
 
+
+use fuzzcheck::DefaultMutator;
+#[derive(DefaultMutator)]
 /// The representation of a table handle. This is created from truncating a sha3-256 based
 /// hash over a transaction hash provided by the environment and a table creation counter
 /// local to the transaction.

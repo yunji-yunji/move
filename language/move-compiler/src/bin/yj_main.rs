@@ -8,7 +8,14 @@ use serde::{Deserialize, Serialize};
 use fuzzcheck::DefaultMutator;
 use fuzzcheck::mutators::testing_utilities::test_mutator;
 
-use crate::compiler::{as_module, compile_units};
+
+// use move_compiler::{
+//     command_line::{self as cli},
+//     shared::{self, Flags, NumericalAddress},
+// };
+
+// use crate::compiler::{as_module, compile_units};
+// use crate::compiler::{as_module, compile_units};
 use move_core_types::{
     account_address::AccountAddress,
     identifier::Identifier,
@@ -82,7 +89,7 @@ fn call_non_existent_function() {
     let code = code.replace("{{ADDR}}", &format!("0x{}", TEST_ADDR));
 
     let mut units = compile_units(&code).unwrap();
-    let m = as_module(units.pop().unwrap());
+    let m = compiler::as_module(units.pop().unwrap());
     let mut blob = vec![];
     m.serialize(&mut blob).unwrap();
 

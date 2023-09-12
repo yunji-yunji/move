@@ -95,6 +95,8 @@ default-members = [
     "language/tools/move-cli",
     "language/tools/move-coverage",
     "language/tools/move-unit-test",
+    # yunji add
+    "language/move-vm/integration-tests",
 ]
 
 # Dependencies that should be kept in sync through the whole workspace

@@ -37,12 +37,14 @@ use std::{borrow::Borrow, collections::BTreeSet, sync::Arc};
 use tracing::warn;
 
 /// An instantiation of the MoveVM.
-pub(crate) struct VMRuntime {
+pub struct VMRuntime {
+    // pub(crate) struct VMRuntime {
     loader: Loader,
 }
 
 impl VMRuntime {
-    pub(crate) fn new(
+    // yunji edit
+    pub fn new(
         natives: impl IntoIterator<Item = (AccountAddress, Identifier, Identifier, NativeFunction)>,
         vm_config: VMConfig,
     ) -> PartialVMResult<Self> {
@@ -479,8 +481,8 @@ impl VMRuntime {
             extensions,
         )
     }
-
-    pub(crate) fn loader(&self) -> &Loader {
+    // yunji edit
+    pub fn loader(&self) -> &Loader {
         &self.loader
     }
 }

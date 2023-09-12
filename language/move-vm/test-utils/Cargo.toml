@@ -21,6 +21,10 @@ move-core-types = {path = "../../move-core/types" }
 move-vm-types = { path = "../types" }
 move-table-extension = { path = "../../extensions/move-table-extension", optional = true }
 
+# yunji add
+[dependencies.fuzzcheck]
+path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+
 [features]
 default = [ ]
 table-extension = [ "move-table-extension" ]
