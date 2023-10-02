@@ -10,10 +10,12 @@ use tempfile::tempdir;
 
 pub fn compile_units(s: &str) -> Result<Vec<AnnotatedCompiledUnit>> {
     let dir = tempdir()?;
+    println!("print in fuzztarget 2.1");
 
     let file_path = dir.path().join("modules.move");
     {
         let mut file = File::create(&file_path)?;
+        println!("print in fuzztarget 2.2 {:?}", s);
         writeln!(file, "{}", s)?;
     }
 
@@ -23,8 +25,10 @@ pub fn compile_units(s: &str) -> Result<Vec<AnnotatedCompiledUnit>> {
         move_stdlib::move_stdlib_named_addresses(),
     )
     .build_and_report()?;
+    println!("print in fuzztarget 2.3");
 
     dir.close()?;
+    println!("print in fuzztarget 2.4");
 
     Ok(units)
 }

@@ -24,6 +24,7 @@ move-table-extension = { path = "../../extensions/move-table-extension", optiona
 # yunji add
 [dependencies.fuzzcheck]
 path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+#path="/home/y23kim/rust/new_fuzzcheck/fuzzcheck-pathcov/fuzzcheck"
 
 [features]
 default = [ ]

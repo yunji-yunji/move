@@ -32,6 +32,12 @@ move-ir-to-bytecode = { path = "../move-ir-compiler/move-ir-to-bytecode" }
 move-borrow-graph = { path = "../move-borrow-graph" }
 move-bytecode-source-map = { path = "../move-ir-compiler/move-bytecode-source-map" }
 move-command-line-common = { path = "../move-command-line-common" }
+# yunji add
+serde = { version="1.0", features = ["derive"] }
+
+[dependencies.fuzzcheck]
+path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+#path="/home/y23kim/rust/new_fuzzcheck/fuzzcheck-pathcov/fuzzcheck"
 
 [dev-dependencies]
 move-stdlib = { path = "../move-stdlib" }

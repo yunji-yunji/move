@@ -23,6 +23,12 @@ move-bytecode-verifier = { path = "../../move-bytecode-verifier" }
 move-core-types = { path = "../../move-core/types" }
 move-vm-types = { path = "../types" }
 move-binary-format = { path = "../../move-binary-format" }
+# yunji add
+serde = { version="1.0", features = ["derive"] }
+
+[dependencies.fuzzcheck]
+path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+
 
 [dev-dependencies]
 anyhow = "1.0.52"

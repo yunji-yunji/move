@@ -84,11 +84,13 @@ pub(crate) static ALLOWED_IDENTIFIERS: &str =
 #[cfg(any(test, feature = "fuzzing"))]
 pub(crate) static ALLOWED_NO_SELF_IDENTIFIERS: &str =
     r"(?:[a-zA-Z][a-zA-Z0-9_]*)|(?:_[a-zA-Z0-9_]+)";
+use fuzzcheck::DefaultMutator;
 
 /// An owned identifier.
 ///
 /// For more details, see the module level documentation.
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[derive(DefaultMutator)]
 #[cfg_attr(feature = "fuzzing", derive(arbitrary::Arbitrary))]
 pub struct Identifier(Box<str>);
 // An identifier cannot be mutated so use Box<str> instead of String -- it is 1 word smaller.

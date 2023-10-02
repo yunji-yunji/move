@@ -72,7 +72,13 @@ impl Deref for Symbol {
 
     fn deref(&self) -> &str {
         let ptr = self.0.get() as *const Entry;
+        // let ptr = self.0.get() as Entry;
         let entry = unsafe { &*ptr };
+        // let entry = ptr.string;
+        // unsafe {(*ptr).string.deref()}
+        // ptr.string.deref()
+        // ptr.string.deref()
+        // (*ptr).string.clone().into_string().as_str()
         &entry.string
     }
 }

@@ -26,7 +26,7 @@ use move_core_types::{
 use move_vm_runtime::move_vm::MoveVM;
 use move_vm_test_utils::{BlankStorage, InMemoryStorage};
 use move_vm_types::gas::UnmeteredGasMeter;
-
+/// This main is not stable.. don't use this
 const TEST_ADDR: AccountAddress = AccountAddress::new([42; AccountAddress::LENGTH]);
 
 // yunji code =============================================

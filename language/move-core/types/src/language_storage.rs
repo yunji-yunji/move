@@ -14,8 +14,6 @@ use std::{
     fmt::{Display, Formatter},
     str::FromStr,
 };
-// yj added
-use fuzzcheck::DefaultMutator;
 
 pub const CODE_TAG: u8 = 0;
 pub const RESOURCE_TAG: u8 = 1;
@@ -23,7 +21,6 @@ pub const RESOURCE_TAG: u8 = 1;
 /// Hex address: 0x1
 pub const CORE_CODE_ADDRESS: AccountAddress = AccountAddress::ONE;
 
-// #[derive(DefaultMutator)]
 #[derive(Serialize, Deserialize, Debug, PartialEq, Hash, Eq, Clone, PartialOrd, Ord)]
 pub enum TypeTag {
     // alias for compatibility with old json serialized data.
@@ -39,10 +36,8 @@ pub enum TypeTag {
     Address,
     #[serde(rename = "signer", alias = "Signer")]
     Signer,
-    // overflow
     #[serde(rename = "vector", alias = "Vector")]
     Vector(Box<TypeTag>),
-    // overflow
     #[serde(rename = "struct", alias = "Struct")]
     Struct(Box<StructTag>),
 
@@ -78,8 +73,8 @@ impl TypeTag {
             U256 => "u256".to_owned(),
             Address => "address".to_owned(),
             Signer => "signer".to_owned(),
-            // Vector(t) => format!("vector<{}>", t.to_canonical_string()),
-            // Struct(s) => s.to_canonical_string(),
+            Vector(t) => format!("vector<{}>", t.to_canonical_string()),
+            Struct(s) => s.to_canonical_string(),
         }
     }
 }
@@ -92,8 +87,9 @@ impl FromStr for TypeTag {
     }
 }
 
-// #[derive(DefaultMutator)]
-// #[derive(Copy)]
+use fuzzcheck::DefaultMutator;
+
+#[derive(DefaultMutator)]
 #[derive(Serialize, Deserialize, Debug, PartialEq, Hash, Eq, Clone, PartialOrd, Ord)]
 pub struct StructTag {
     pub address: AccountAddress,

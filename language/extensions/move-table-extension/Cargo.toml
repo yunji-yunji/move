@@ -33,3 +33,4 @@ move-package = { path = "../../tools/move-package" }
 
 [dependencies.fuzzcheck]
 path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+#path="/home/y23kim/rust/new_fuzzcheck/fuzzcheck-pathcov/fuzzcheck"

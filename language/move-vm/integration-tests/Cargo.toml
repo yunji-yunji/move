@@ -30,6 +30,7 @@ serde = { version="1.0", features = ["derive"] }
 
 [dependencies.fuzzcheck]
 path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+#path="/home/y23kim/rust/new_fuzzcheck/fuzzcheck-pathcov/fuzzcheck"
 
 [features]
 default = []
@@ -37,10 +38,10 @@ table-extension = [
     "move-table-extension",
     "move-vm-test-utils/table-extension"
 ]
-
-[lib]
-name = "yj"
-path = "src/lib.rs"
+#
+#[lib]
+#name = "yj"
+#path = "src/lib.rs"
 
 # yj added
 #[[bin]]

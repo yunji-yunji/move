@@ -7,6 +7,7 @@
 use serde::{Deserialize, Serialize};
 use fuzzcheck::DefaultMutator;
 use fuzzcheck::mutators::testing_utilities::test_mutator;
+use fuzzcheck::mutators::tuples::TupleStructure;
 
 
 // use move_compiler::{

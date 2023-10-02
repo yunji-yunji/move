@@ -45,13 +45,30 @@ move-vm-types = { path = "../move-vm/types" }
 move-vm-test-utils = { path = "../move-vm/test-utils" }
 move-stdlib = { path = "../move-stdlib" }
 move-table-extension = { path = "../extensions/move-table-extension", optional = true }
+move-vm-integration-tests = { path = "../move-vm/integration-tests" }
 
 #move-compiler = { path = "../move-compiler" }
 #serde = { version="1.0", features = ["derive"] }
 tracing = "0.1.26"
 
+
+#[dependencies.proc-macro2]
+#version = "1.0"
+#
+#[dependencies.quote]
+#version = "1.0"
+#
+#[dependencies.syn]
+#version = "2"
+#features = [
+#    "derive",
+#    "parsing",
+#]
+
+
 [dependencies.fuzzcheck]
 path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+#path="/home/y23kim/rust/new_fuzzcheck/fuzzcheck-pathcov/fuzzcheck"
 # yunji add ===================
 
 [features]

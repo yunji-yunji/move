@@ -1,6 +1,9 @@
 // Copyright (c) The Diem Core Contributors
 // Copyright (c) The Move Contributors
 // SPDX-License-Identifier: Apache-2.0
+#![allow(unused_attributes)]
+#![feature(no_coverage)]
+#![feature(impl_trait_in_assoc_type)]
 
 use std::{collections::BTreeSet, sync::Arc};
 
@@ -17,7 +20,11 @@ use move_core_types::{
     metadata::Metadata, resolver::MoveResolver,
 };
 
+use fuzzcheck::DefaultMutator;
+use serde::{Deserialize, Serialize};
+
 // #[derive(Copy)]
+#[derive(DefaultMutator)]
 pub struct MoveVM {
     runtime: VMRuntime,
 }

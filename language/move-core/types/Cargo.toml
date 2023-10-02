@@ -39,6 +39,7 @@ bcs.workspace = true
 
 [dependencies.fuzzcheck]
 path="/home/y23kim/rust/fuzzcheck-rs/fuzzcheck"
+#path="/home/y23kim/rust/new_fuzzcheck/fuzzcheck-pathcov/fuzzcheck"
 
 [dev-dependencies]
 proptest = "1.0.0"

@@ -97,6 +97,7 @@ default-members = [
     "language/tools/move-unit-test",
     # yunji add
     "language/move-vm/integration-tests",
+    "language/move-bytecode-verifier",
 ]
 
 # Dependencies that should be kept in sync through the whole workspace
