@@ -1,0 +1,30 @@
+{
+  "version": 6,
+  "self_module_handle_idx": 0,
+  "module_handles": [
+    {
+      "address": 0,
+      "name": 0
+    }
+  ],
+  "struct_handles": [],
+  "function_handles": [],
+  "field_handles": [],
+  "friend_decls": [],
+  "struct_def_instantiations": [],
+  "function_instantiations": [],
+  "field_instantiations": [],
+  "signatures": [
+    []
+  ],
+  "identifiers": [
+    "<SELF>"
+  ],
+  "address_identifiers": [
+    "00000000000000000000000000000000"
+  ],
+  "constant_pool": [],
+  "metadata": [],
+  "struct_defs": [],
+  "function_defs": []
+}

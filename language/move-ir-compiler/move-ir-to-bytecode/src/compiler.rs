@@ -11,6 +11,8 @@ use move_binary_format::{
         SignatureToken, StructDefinition, StructDefinitionIndex, StructFieldInformation,
         StructHandleIndex, StructTypeParameter, TableIndex, TypeParameterIndex, TypeSignature,
         Visibility,
+        // yunji
+        json_to_module, module_to_json, mutate_module,
     },
     file_format_common::VERSION_MAX,
 };
@@ -29,6 +31,10 @@ use std::{
     },
     fmt::Write,
 };
+
+// yunji
+use rand::{rngs::StdRng, Rng};
+
 
 macro_rules! record_src_loc {
     (local: $context:expr, $var:expr) => {{
@@ -323,6 +329,7 @@ pub fn compile_script<'a>(
 ) -> Result<(CompiledScript, SourceMap)> {
     verify_script(&script)?;
 
+    println!("yj in compile_script function in compilers.rs");
     let mut context = Context::new(script.loc, HashMap::new(), None)?;
     for dep in dependencies {
         context.add_compiled_dependency(dep)?;
@@ -400,10 +407,13 @@ pub fn compile_module<'a>(
     dependencies: impl IntoIterator<Item = &'a CompiledModule>,
 ) -> Result<(CompiledModule, SourceMap)> {
     verify_module(&module)?;
-
+    println!("IS this part executed?1 in compile_module function in compiler.rs");
+    println!("yj moduleDefinition = {:?}", module);
     let current_module = module.identifier;
     let mut context = Context::new(module.loc, HashMap::new(), Some(current_module))?;
     for dep in dependencies {
+        println!("yj dep = {:?}", dep);
+
         context.add_compiled_dependency(dep)?;
     }
 
@@ -415,6 +425,7 @@ pub fn compile_module<'a>(
     let self_module_handle_idx = context.declare_import(current_module, self_name)?;
     // Explicitly declare all imports as they will be included even if not used
     compile_imports(&mut context, module.imports.clone())?;
+    println!("IS this part executed?2 in compile_module function in compiler.rs");
 
     // Add explicit handles/dependency declarations to `dependencies`
     compile_explicit_dependency_declarations(
@@ -422,6 +433,7 @@ pub fn compile_module<'a>(
         module.imports,
         module.explicit_dependency_declarations,
     )?;
+    println!("IS this part executed?3 in compile_module function in compiler.rs");
 
     // Explicitly declare all structs as they will be included even if not used
     for s in &module.structs {
@@ -486,6 +498,21 @@ pub fn compile_module<'a>(
         struct_defs,
         function_defs,
     };
+    println!("IS this part executed?fin in compile_module function in compiler.rs {:?}", module);
+
+    // yj: generate random instance here
+    // println!("before run json_to_module");
+    // json_to_module();
+    // println!("after run json_to_module");
+
+
+    println!("before run mutate_module");
+    // module_to_json();
+    let mm = mutate_module();
+    println!("after run mutate_module = {:?}", mm);
+    module_to_json(mm, 4);
+    println!("after module to jason =================");
+
     Ok((module, source_map))
 }
 

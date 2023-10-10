@@ -29,6 +29,12 @@ mod unit_tests;
 
 pub use file_format::CompiledModule;
 
+// yunji
+use serde::{Deserialize, Serialize, Serializer};
+// use serde;
+// #[derive(Serialize, Deserialize)]
+// #[derive(Deserialize)]
+// #[serde(untagged)]
 /// Represents a kind of index -- useful for error messages.
 #[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum IndexKind {
@@ -51,6 +57,36 @@ pub enum IndexKind {
     CodeDefinition,
     TypeParameter,
     MemberCount,
+}
+
+impl Serialize for IndexKind {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+    S:Serializer,
+    {
+
+        match *self {
+            IndexKind::ModuleHandle => serializer.serialize_str("module handle"),
+            IndexKind::StructHandle => serializer.serialize_str("struct handle"),
+            IndexKind::FunctionHandle => serializer.serialize_str("function handle"),
+            IndexKind::FieldHandle => serializer.serialize_str("field handle"),
+            IndexKind::FriendDeclaration => serializer.serialize_str("friend declaration"),
+            IndexKind::StructDefInstantiation => serializer.serialize_str("struct instantiation"),
+            IndexKind::FunctionInstantiation => serializer.serialize_str("function instantiation"),
+            IndexKind::FieldInstantiation => serializer.serialize_str("field instantiation"),
+            IndexKind::StructDefinition => serializer.serialize_str("struct definition"),
+            IndexKind::FunctionDefinition => serializer.serialize_str("function definition"),
+            IndexKind::FieldDefinition => serializer.serialize_str("field definition"),
+            IndexKind::Signature => serializer.serialize_str("signature"),
+            IndexKind::Identifier => serializer.serialize_str("identifier"),
+            IndexKind::AddressIdentifier => serializer.serialize_str("address identifier"),
+            IndexKind::ConstantPool => serializer.serialize_str("constant pool"),
+            IndexKind::LocalPool => serializer.serialize_str("local pool"),
+            IndexKind::CodeDefinition => serializer.serialize_str("code definition pool"),
+            IndexKind::TypeParameter => serializer.serialize_str("type parameter"),
+            IndexKind::MemberCount => serializer.serialize_str("field offset"),
+        }
+    }
 }
 
 impl IndexKind {

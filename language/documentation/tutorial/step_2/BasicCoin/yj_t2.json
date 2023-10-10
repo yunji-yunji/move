@@ -1,0 +1,73 @@
+{
+  "version": 6,
+  "self_module_handle_idx": 0,
+  "module_handles": [
+    {
+      "address": 0,
+      "name": 0
+    }
+  ],
+  "struct_handles": [
+    {
+      "module": 0,
+      "name": 2,
+      "abilities": 0,
+      "type_parameters": []
+    }
+  ],
+  "function_handles": [
+    {
+      "module": 0,
+      "name": 1,
+      "parameters": 0,
+      "return_": 0,
+      "type_parameters": []
+    }
+  ],
+  "field_handles": [],
+  "friend_decls": [],
+  "struct_def_instantiations": [],
+  "function_instantiations": [],
+  "field_instantiations": [],
+  "signatures": [
+    []
+  ],
+  "identifiers": [
+    "<SELF>",
+    "foo",
+    "Bar",
+    "x"
+  ],
+  "address_identifiers": [
+    "00000000000000000000000000000000"
+  ],
+  "constant_pool": [],
+  "metadata": [],
+  "struct_defs": [
+    {
+      "struct_handle": 0,
+      "field_information": {
+        "Declared": [
+          {
+            "name": 3,
+            "signature": "U64"
+          }
+        ]
+      }
+    }
+  ],
+  "function_defs": [
+    {
+      "function": 0,
+      "visibility": "Private",
+      "is_entry": false,
+      "acquires_global_resources": [],
+      "code": {
+        "locals": 0,
+        "code": [
+          "Ret"
+        ]
+      }
+    }
+  ]
+}
