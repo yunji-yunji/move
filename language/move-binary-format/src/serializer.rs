@@ -73,30 +73,30 @@ where
     write_u64_as_uleb128(binary, x)
 }
 
-pub fn serialize_signature_index(binary: &mut BinaryData, idx: &SignatureIndex) -> Result<()> {
+fn serialize_signature_index(binary: &mut BinaryData, idx: &SignatureIndex) -> Result<()> {
     write_as_uleb128(binary, idx.0, SIGNATURE_INDEX_MAX)
 }
 
-pub fn serialize_module_handle_index(binary: &mut BinaryData, idx: &ModuleHandleIndex) -> Result<()> {
+fn serialize_module_handle_index(binary: &mut BinaryData, idx: &ModuleHandleIndex) -> Result<()> {
     write_as_uleb128(binary, idx.0, MODULE_HANDLE_INDEX_MAX)
 }
 
-pub fn serialize_identifier_index(binary: &mut BinaryData, idx: &IdentifierIndex) -> Result<()> {
+fn serialize_identifier_index(binary: &mut BinaryData, idx: &IdentifierIndex) -> Result<()> {
     write_as_uleb128(binary, idx.0, IDENTIFIER_INDEX_MAX)
 }
 
-pub fn serialize_struct_handle_index(binary: &mut BinaryData, idx: &StructHandleIndex) -> Result<()> {
+fn serialize_struct_handle_index(binary: &mut BinaryData, idx: &StructHandleIndex) -> Result<()> {
     write_as_uleb128(binary, idx.0, STRUCT_HANDLE_INDEX_MAX)
 }
 
-pub fn serialize_address_identifier_index(
+fn serialize_address_identifier_index(
     binary: &mut BinaryData,
     idx: &AddressIdentifierIndex,
 ) -> Result<()> {
     write_as_uleb128(binary, idx.0, ADDRESS_INDEX_MAX)
 }
 
-pub fn serialize_struct_def_index(binary: &mut BinaryData, idx: &StructDefinitionIndex) -> Result<()> {
+fn serialize_struct_def_index(binary: &mut BinaryData, idx: &StructDefinitionIndex) -> Result<()> {
     write_as_uleb128(binary, idx.0, STRUCT_DEF_INDEX_MAX)
 }
 

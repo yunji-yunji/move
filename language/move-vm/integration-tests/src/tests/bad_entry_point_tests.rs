@@ -2,11 +2,8 @@
 // Copyright (c) The Move Contributors
 // SPDX-License-Identifier: Apache-2.0
 #![allow(unused_attributes)]
-// #![feature(no_coverage)]
 #![feature(impl_trait_in_assoc_type)]
 use serde::{Deserialize, Serialize};
-// use fuzzcheck::DefaultMutator;
-// use fuzzcheck::mutators::testing_utilities::test_mutator;
 
 use crate::compiler::{as_module, compile_units};
 use move_core_types::{
@@ -21,36 +18,6 @@ use move_vm_test_utils::{BlankStorage, InMemoryStorage};
 use move_vm_types::gas::UnmeteredGasMeter;
 
 const TEST_ADDR: AccountAddress = AccountAddress::new([42; AccountAddress::LENGTH]);
-
-// yunji code =============================================
-// #[derive(Serialize, Deserialize)]
-// #[derive(Clone, Debug, PartialEq, Eq, Hash, DefaultMutator)]
-// struct SampleStruct2<T, U> {
-//     x: T,
-//     y: U,
-//     n: U,
-// }
-// fn fuzz_target(s: &SampleStruct2<u16, u16>) {
-//     println!("fuzz_target called in main");
-// }
-//
-// fn main() {
-//     println!("Main function in bad_entry_point file.");
-//
-//     let m = SampleStruct2::<u8, u8>::default_mutator();
-//     test_mutator(m, 1000., 1000., false, true, 50, 50);
-//     let result = fuzzcheck::fuzz_test(fuzz_target)
-//         .default_mutator()
-//         .serde_serializer()
-//         .default_sensor_and_pool()
-//         .arguments_from_cargo_fuzzcheck()
-//         .stop_after_first_test_failure(true)
-//         .launch();
-//     println!("DONE execution yjyj");
-// }
-// yunji code =============================================
-
-
 
 #[test]
 fn call_non_existent_module() {
