@@ -45,8 +45,18 @@ use move_core_types::{
 use proptest::{collection::vec, prelude::*, strategy::BoxedStrategy};
 use ref_cast::RefCast;
 use serde::{Deserialize, Serialize};
+// use serde::{Serializer};
 use std::ops::BitOr;
 use variant_count::VariantCount;
+
+
+// yunji use
+use std::fs::File;
+use std::io::Write;
+// use serde_json::serde_json;
+use rand::Rng;
+use rand::prelude::Distribution;
+use rand::distributions::Standard;
 
 /// Generic index into one of the tables in the binary format.
 pub type TableIndex = u16;
@@ -57,6 +67,7 @@ macro_rules! define_index {
         kind: $kind: ident,
         doc: $comment: literal,
     } => {
+        #[derive(Serialize, Deserialize)]
         #[derive(Clone, Copy, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
         #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
         #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -214,6 +225,8 @@ pub const NO_TYPE_ARGUMENTS: SignatureIndex = SignatureIndex(0);
 /// Modules introduce a scope made of all types defined in the module and all functions.
 /// Type definitions (fields) are private to the module. Outside the module a
 /// Type is an opaque handle.
+
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -238,6 +251,7 @@ pub struct ModuleHandle {
 ///
 /// At link time ability/constraint checking is performed and an error is reported if there is a
 /// mismatch with the definition.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -280,6 +294,7 @@ pub struct StructTypeParameter {
 /// and the verifier enforces that property. The signature of the function is used at link time to
 /// ensure the function reference is valid and it is also used by the verifier to type check
 /// function calls.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(params = "usize"))]
@@ -298,6 +313,7 @@ pub struct FunctionHandle {
 }
 
 /// A field access info (owner type and offset)
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -311,6 +327,7 @@ pub struct FieldHandle {
 // Definitions are the module code. So the set of types and functions in the module.
 
 /// `StructFieldInformation` indicates whether a struct is native or has user-specified fields
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -329,6 +346,7 @@ pub enum StructFieldInformation {
 // `StructInstantiation`s
 
 /// A complete or partial instantiation of a generic struct
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -339,6 +357,7 @@ pub struct StructDefInstantiation {
 }
 
 /// A complete or partial instantiation of a function
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -354,6 +373,7 @@ pub struct FunctionInstantiation {
 /// of the owner type.
 /// E.g. for `S<u8, bool>.f` where `f` is a field of any type, `instantiation`
 /// would be `[u8, bool]`
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -365,6 +385,7 @@ pub struct FieldInstantiation {
 
 /// A `StructDefinition` is a type definition. It either indicates it is native or defines all the
 /// user-specified fields declared on the type.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -398,6 +419,7 @@ impl StructDefinition {
 }
 
 /// A `FieldDefinition` is the definition of a field: its name and the field type.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -453,6 +475,7 @@ impl std::convert::TryFrom<u8> for Visibility {
 
 /// A `FunctionDefinition` is the implementation of a function. It defines
 /// the *prototype* of the function and the function body.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(params = "usize"))]
@@ -506,6 +529,7 @@ impl FunctionDefinition {
 
 /// A type definition. `SignatureToken` allows the definition of the set of known types and their
 /// composition.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -515,6 +539,7 @@ pub struct TypeSignature(pub SignatureToken);
 // TODO: remove at some point or move it in the front end (language/move-ir-compiler)
 /// A `FunctionSignature` in internally used to create a unique representation of the overall
 /// signature as need. Consider deprecated...
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(params = "usize"))]
@@ -540,6 +565,7 @@ pub struct FunctionSignature {
 ///
 /// Locals include the arguments to the function from position `0` to argument `count - 1`.
 /// The remaining elements are the type of each local.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq, Ord, PartialOrd)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(params = "usize"))]
@@ -836,6 +862,7 @@ impl Arbitrary for AbilitySet {
 ///
 /// A SignatureToken can express more types than the VM can handle safely, and correctness is
 /// enforced by the verifier.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "fuzzing", derive(arbitrary::Arbitrary))]
 pub enum SignatureToken {
@@ -869,6 +896,33 @@ pub enum SignatureToken {
     /// Unsigned integers, 256 bits length.
     U256,
 }
+
+impl Distribution<SignatureToken> for Standard {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> SignatureToken {
+        // match rng.gen_range(0, 3) { // rand 0.5, 0.6, 0.7
+        match rng.gen_range(0..=14) { // rand 0.8
+            0 => SignatureToken::Bool,
+            1 => SignatureToken::U8,
+            2 => SignatureToken::U64,
+            3 => SignatureToken::U128,
+            4 => SignatureToken::Address,
+            5 => SignatureToken::Signer,
+            6 => SignatureToken::Vector(Box::new(SignatureToken::Address)),
+            7 => SignatureToken::Struct(StructHandleIndex(rand::thread_rng().gen())),
+            8 => SignatureToken::StructInstantiation(
+                StructHandleIndex(rand::thread_rng().gen()),
+                Vec::new()),
+            9 => SignatureToken::Reference(Box::new(SignatureToken::Address)),
+            10 => SignatureToken::MutableReference(Box::new(SignatureToken::Address)),
+            11 => SignatureToken::TypeParameter(rand::thread_rng().gen()),    //u16
+            12 => SignatureToken::U16,
+            13 => SignatureToken::U32,
+            14 => SignatureToken::U256,
+            _ => SignatureToken::Bool,
+        }
+    }
+}
+
 
 /// An iterator to help traverse the `SignatureToken` in a non-recursive fashion to avoid
 /// overflowing the stack.
@@ -1114,6 +1168,7 @@ impl SignatureToken {
 
 /// A `Constant` is a serialized value along with its type. That type will be deserialized by the
 /// loader/evauluator
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "fuzzing", derive(arbitrary::Arbitrary))]
 pub struct Constant {
@@ -1122,6 +1177,7 @@ pub struct Constant {
 }
 
 /// A `CodeUnit` is the body of a function. It has the function header and the instruction stream.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(params = "usize"))]
@@ -1142,6 +1198,7 @@ pub struct CodeUnit {
 ///
 /// Bytecodes operate on a stack machine and each bytecode has side effect on the stack and the
 /// instruction stream.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Hash, Eq, VariantCount, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(proptest_derive::Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -1782,7 +1839,6 @@ impl Bytecode {
         v
     }
 }
-
 /// Contains the main function to execute and its dependencies.
 ///
 /// A CompiledScript does not have definition tables because it can only have a `main(args)`.
@@ -1830,6 +1886,7 @@ impl CompiledScript {
 /// It is a unit of code that can be used by transactions or other modules.
 ///
 /// A module is published as a single entry and it is retrieved as a single blob.
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 #[cfg_attr(feature = "fuzzing", derive(arbitrary::Arbitrary))]
 pub struct CompiledModule {
@@ -2115,6 +2172,212 @@ pub fn basic_test_module() -> CompiledModule {
 
     m
 }
+
+/// my codes
+// yunji
+pub fn module_to_json(m: CompiledModule, n:usize) {
+    println!("module_to_json");
+
+    /// write CompileModule as Json
+    let json = serde_json::to_string_pretty(&m).expect("write json yj");
+    let mut file = File::create(format!("yj{:?}.json", n)).expect("cannot create file");
+    file.write_all(json.as_bytes()).expect("cannot write file");
+
+}
+
+pub fn json_to_module() -> CompiledModule {
+    println!("module from seed excuted@!!");
+
+    /// name of seed file. (assert(not directory, seed file)
+    let file_name = "/home/y23kim/rust/tutorial_move/seed/seed2.json";
+    // let contents = fs::read_to_string(file_name).expect("read seed file in file_format.rs");
+    // let data_vector: Vec<usize> = contents
+    //     .split_whitespace()
+    //     .map(|s| s.parse::<usize>().unwrap())
+    //     .collect();
+    let file = File::open(file_name).expect("Failed to open file");
+    let cm: CompiledModule = serde_json::from_reader(file).expect("Failed to deserialize");
+
+    println!("my CompiledModule {:?}", cm);
+    cm
+}
+
+pub fn mutate_module(m: &mut CompiledModule) -> &mut CompiledModule {
+// pub fn mutate_module() -> CompiledModule {
+//     let mut m = json_to_module();
+
+    // mutation process
+    // 1. version
+    m.version = m.version + 1;
+
+    // 2. self_module_handle_idx
+    // m.self_module_handle_idx += 1;
+    // let mut rand_usize : usize = rand::thread_rng().gen(); // TableIndex = u16;
+    // let mutate_idx : usize = m.self_module_handle_idx.into_index() + rand_usize;
+    // println!("mutate_idx {:?}", mutate_idx);
+    let prev_val :u16 =  m.self_module_handle_idx.into_index().try_into().unwrap();
+    println!("prev value {:?}", prev_val);
+    m.self_module_handle_idx = ModuleHandleIndex( prev_val+ rand::thread_rng().gen_range(0..=65535));
+
+    // 3. module_handles
+    let mut rand_u16 : u16 = rand::thread_rng().gen();
+    let mut new_module_handle = ModuleHandle {
+        address: AddressIdentifierIndex(rand_u16),
+        name: IdentifierIndex(rand_u16),
+    };
+    // if m.module_handles.len() ==0 {
+    //     new_module_handle = ModuleHandle {
+    //         address: AddressIdentifierIndex(100),
+    //         name: IdentifierIndex(100),
+    //     }
+    // } else {
+    //     new_module_handle = m.module_handles[0];
+    //     new_module_handle.address += 10;
+    //     new_module_handle.name -= 10;
+    // }
+    m.module_handles.push(new_module_handle);
+
+    // 4. struct_handles
+    m.struct_handles.push(StructHandle {
+        module: ModuleHandleIndex(123),
+        name: IdentifierIndex(456),
+        abilities: AbilitySet(rand::thread_rng().gen_range(0..255)), // u8 0..=255
+        type_parameters: vec![],
+    });
+
+    // 5. function_handles
+    m.function_handles.push(FunctionHandle {
+        module: ModuleHandleIndex(10),
+        name: IdentifierIndex(m.identifiers.len() as u16),
+        parameters: SignatureIndex(20),
+        return_: SignatureIndex(30),
+        type_parameters: vec![],
+    });
+
+    // 6. field_handles
+    m.field_handles.push(FieldHandle {
+        owner: StructDefinitionIndex(333),
+        field: 4440,
+    });
+
+    // 7. friend_decls
+    rand_u16 = rand::thread_rng().gen();
+    let mut new_module_handle2 = ModuleHandle {
+        address: AddressIdentifierIndex(rand_u16),
+        name: IdentifierIndex(rand_u16),
+    };
+    // // new_module_handle.address += 100;
+    // new_module_handle.address = ModuleHandleIndex(
+    //     new_module_handle.address.into_index() + rand::thread_rng().gen());
+    //
+    // // new_module_handle.name -= 200;
+    // new_module_handle.name = IdentifierIndex(
+    //     new_module_handle.name.into_index() + rand::thread_rng().gen());
+
+    m.friend_decls.push(new_module_handle2);
+
+    // 8. struct_def_instantiations
+    m.struct_def_instantiations.push(StructDefInstantiation {
+        def: StructDefinitionIndex(12),
+        type_parameters: SignatureIndex(33),
+    });
+
+    // 9. function_instantiations
+    m.function_instantiations.push(FunctionInstantiation {
+        handle: FunctionHandleIndex(7878),
+        type_parameters: SignatureIndex(4545),
+    });
+
+    // 10. field_instantiations
+    m.field_instantiations.push(FieldInstantiation {
+        handle: FieldHandleIndex(3838),
+        type_parameters: SignatureIndex(21),
+    });
+
+    // 11. signatures
+    // Signature = Vec<SignatureToken>
+    let mut signature : Signature = Default::default();
+
+    let token1: SignatureToken = rand::random();
+    let token2: SignatureToken = rand::random();
+    signature.0.push(token1);
+    signature.0.push(token2);   // SignatureToken
+
+
+    m.signatures.push(signature);
+
+    // 12. identifiers
+    // pub struct Identifier(Box<str>);
+    m.identifiers.push(Identifier::new("Yunji".to_string()).unwrap());
+    // m.identifiers.push(Identifier::new("^_^*".to_string()).unwrap());
+    m.identifiers.push(Identifier::new("Hello".to_string()).unwrap());
+    m.identifiers.push(Identifier::new("Hello".to_string()).unwrap());
+
+
+    // 13. address_identifiers
+    // AccountAddress
+    // pub struct AccountAddress([u8; AccountAddress::LENGTH]);
+    let mut rng = rand::thread_rng();
+    let mut bytes = [0u8; AccountAddress::LENGTH];
+    rng.fill(&mut bytes);
+
+    let address = AccountAddress::new(bytes);
+    m.address_identifiers.push(address);
+    println!("address yj = {:?}", address);
+
+    // 14. constant_pool
+    // pub type ConstantPool = Vec<Constant>;
+    //pub struct Constant {
+    //     pub type_: SignatureToken,
+    //     pub data: Vec<u8>,
+    // }
+    let length = rand::thread_rng().gen_range(1..=500);
+    let random_data: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
+    m.constant_pool.push(Constant{
+        type_: rand::random(),
+        data: random_data,
+    });
+
+
+
+    // 15. metadata
+    // pub struct Metadata {
+    //     pub key: Vec<u8>,
+    //     pub value: Vec<u8>,
+    // }
+    let random_k: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
+    let random_v: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
+    m.metadata.push(Metadata {
+        key: random_k,
+        value: random_v,
+    });
+
+    // 16. struct_defs
+    let token3: SignatureToken = rand::random();
+    m.struct_defs.push(StructDefinition {
+        struct_handle: StructHandleIndex(rand::thread_rng().gen_range(0..=65535)),
+        field_information: StructFieldInformation::Declared(vec![FieldDefinition {
+            name: IdentifierIndex(m.identifiers.len() as u16),
+            signature: TypeSignature(token3),
+        }]),
+    });
+
+    // 17. function_defs
+    m.function_defs.push(FunctionDefinition {
+        function: FunctionHandleIndex(rand::thread_rng().gen_range(0..=65535)),
+        visibility: Visibility::Private,
+        is_entry: false,
+        acquires_global_resources: vec![],
+        code: Some(CodeUnit {
+            locals: SignatureIndex(rand::thread_rng().gen_range(0..=65535)),
+            code: vec![Bytecode::Ret],
+        }),
+    });
+
+
+    m
+}
+
 
 /// Return a simple script that contains only a return in the main()
 pub fn empty_script() -> CompiledScript {

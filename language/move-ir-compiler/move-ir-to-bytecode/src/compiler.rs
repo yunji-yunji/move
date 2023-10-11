@@ -406,7 +406,7 @@ pub fn compile_module<'a>(
     for dep in dependencies {
         context.add_compiled_dependency(dep)?;
     }
-
+    println!("IS this part executed?1 in compile_module");
     // Compile friends
     let friend_decls = compile_friends(&mut context, module.friends)?;
 

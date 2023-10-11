@@ -87,9 +87,9 @@ impl FromStr for TypeTag {
     }
 }
 
-use fuzzcheck::DefaultMutator;
+// use fuzzcheck::DefaultMutator;
 
-#[derive(DefaultMutator)]
+// #[derive(DefaultMutator)]
 #[derive(Serialize, Deserialize, Debug, PartialEq, Hash, Eq, Clone, PartialOrd, Ord)]
 pub struct StructTag {
     pub address: AccountAddress,

@@ -17,6 +17,9 @@ fail = "0.4.0"
 move-borrow-graph = { path = "../move-borrow-graph" }
 move-binary-format = { path = "../move-binary-format" }
 move-core-types = { path = "../move-core/types" }
+#
+serde = { version="1.0", features = ["derive"] }
+serde_json = "1.0"
 
 [dev-dependencies]
 hex-literal = "0.3.4"

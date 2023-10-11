@@ -3100,6 +3100,7 @@ dependencies = [
  "once_cell",
  "proptest",
  "proptest-derive",
+ "rand 0.8.4",
  "ref-cast",
  "serde 1.0.188",
  "serde_json",
@@ -3147,6 +3148,8 @@ dependencies = [
  "move-borrow-graph",
  "move-core-types",
  "petgraph 0.5.1",
+ "serde 1.0.188",
+ "serde_json",
 ]
 
 [[package]]

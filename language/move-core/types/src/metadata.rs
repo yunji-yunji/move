@@ -1,7 +1,9 @@
 // Copyright (c) The Move Contributors
 // SPDX-License-Identifier: Apache-2.0
+use serde::{Deserialize, Serialize};
 
 /// Representation of metadata,
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "fuzzing", derive(arbitrary::Arbitrary))]
 pub struct Metadata {

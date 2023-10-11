@@ -114,6 +114,7 @@ pub fn verify_module_with_config(config: &VerifierConfig, module: &CompiledModul
                 .finish(Location::Undefined),
         )
     });
+    println!("in verify module wc: {:?}", module.module_handles);
     move_core_types::state::set_state(prev_state);
     result
 }

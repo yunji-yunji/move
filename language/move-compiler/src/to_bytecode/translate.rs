@@ -180,6 +180,8 @@ fn module(
         (BTreeSet<(ModuleIdent, StructName)>, IR::FunctionSignature),
     >,
 ) -> Option<AnnotatedCompiledUnit> {
+    println!("IS this part executed?1 in module in translate.rs");
+
     let mut context = Context::new(compilation_env, Some(&ident));
     let structs = mdef
         .structs
@@ -251,8 +253,11 @@ fn module(
         functions,
         synthetics: vec![],
     };
+    println!("IS this part executed?2 in module in translate.rs");
+
     let deps: Vec<&F::CompiledModule> = vec![];
-    let (module, source_map) = match move_ir_to_bytecode::compiler::compile_module(ir_module, deps)
+    let (module, source_map) =
+        match move_ir_to_bytecode::compiler::compile_module(ir_module, deps)
     {
         Ok(res) => res,
         Err(e) => {
@@ -263,6 +268,8 @@ fn module(
             return None;
         }
     };
+    println!("IS this part executed?3 in module in translate.rs {:?}", deps);
+
     let function_infos = module_function_infos(&module, &source_map, &collected_function_infos);
     let module = NamedCompiledModule {
         package_name: mdef.package_name,
