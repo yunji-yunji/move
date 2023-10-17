@@ -4,19 +4,31 @@
 
 extern crate serde_json;
 use std::fmt::Debug;
-use move_binary_format::file_format::{CompiledModule, json_to_module, module_to_json, mutate_module};
+use move_binary_format::file_format::{
+    CompiledModule, module_to_json, json_to_module, mutate_module};
+use move_binary_format::builder;
+use move_binary_format::fuzzer::Fuzzer;
+use move_bytecode_verifier::{self, VerifierConfig};
 
-fn fuzz_target(cm: CompiledModule) {
-    println!("in fuzz target {:?}", cm);
+fn fuzz_target(cm: &CompiledModule) {
+// fn fuzz_target(cm: &CompiledModule) -> bool {
+//     println!("in fuzz target");
     let verifier_config : VerifierConfig= VerifierConfig::default();
-    move_bytecode_verifier::verify_module_with_config(&verifier_config, &cm);
-
+    move_bytecode_verifier::verify_module_with_config(&verifier_config, cm);
+    // return true;
 }
-
-use move_bytecode_verifier::{self, VerifierConfig, cyclic_dependencies, dependencies};
 
 fn main() {
     println!("yj Run bv. entry point");
+    // let m = SampleStruct2::<u8, u8>::default_mutator();
+    // let result = fuzzcheck::fuzz_test(fuzz_target)
+
+
+
+    // let initial_inputs = fuzzer.read_input_corpus();
+    // println!("[{:?}] initial seeds = {:?}",
+    //          initial_inputs.as_ref().expect("length").len(), initial_inputs.as_ref());
+
     /// read single seed input file and transform to CM
     let mut original_m = json_to_module();
     println!("before mutate {:?}", original_m);
@@ -26,19 +38,11 @@ fn main() {
     println!("after mutate {:?}", cm);
 
     /// execute PUT with mutated input
-    fuzz_target(cm.clone());
-
-    /// Codes using Fuzzcheck-rs
-    // let m = CompiledModule::<u8, u8>::default_mutator();
-    // test_mutator(m, 1000., 1000., false, true, 50, 50);
-    //
-    // let result = fuzzcheck::fuzz_test(fuzz_target2)
-    //     .default_mutator()
-    //     .serde_serializer()
-    //     .default_sensor_and_pool()
-    //     .arguments_from_cargo_fuzzcheck()
-    //     .stop_after_first_test_failure(true)
-    //     .launch();
-    // println!("after result");
+    // fuzz_target(&cm);
+    let res = builder::fuzz_test(fuzz_target).launch();
+    // let verifier_config : VerifierConfig= VerifierConfig::default();
+    // let res = builder::fuzz_test(move_bytecode_verifier::verify_module_with_config).launch();
+    // fuzzer1.set_fuzz_test(fuzz_target);
+    println!("run test last part builder={:?}", res);
 
 }

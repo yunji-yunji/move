@@ -1930,6 +1930,226 @@ pub struct CompiledModule {
     pub function_defs: Vec<FunctionDefinition>,
 }
 
+impl CompiledModule {
+    /// from_data
+    pub fn from_data(&self, data: &[u8]) -> Option<Self> {
+        serde_json::from_slice(data).ok()
+    }
+
+    /// to data
+    pub fn to_data(&self, value: &Self) -> Vec<u8> {
+        serde_json::to_vec(value).unwrap()
+    }
+}
+
+// yunji
+pub fn module_to_json(m: CompiledModule, n:usize) {
+    println!("module_to_json");
+
+    /// write CompileModule as Json
+    let json = serde_json::to_string_pretty(&m).expect("write json yj");
+    let mut file = File::create(format!("yj{:?}.json", n)).expect("cannot create file");
+    file.write_all(json.as_bytes()).expect("cannot write file");
+
+}
+
+pub fn json_to_module() -> CompiledModule {
+    println!("module from seed excuted@!!");
+
+    /// name of seed file. (assert(not directory, seed file)
+    let file_name = "/home/y23kim/rust/tutorial_move/seed/seed2.json";
+    // let contents = fs::read_to_string(file_name).expect("read seed file in file_format.rs");
+    // let data_vector: Vec<usize> = contents
+    //     .split_whitespace()
+    //     .map(|s| s.parse::<usize>().unwrap())
+    //     .collect();
+    let file = File::open(file_name).expect("Failed to open file");
+    let cm: CompiledModule = serde_json::from_reader(file).expect("Failed to deserialize");
+
+    println!("my CompiledModule {:?}", cm);
+    cm
+}
+
+pub fn mutate_module(m: &mut CompiledModule) -> &mut CompiledModule {
+// pub fn mutate_module() -> CompiledModule {
+//     let mut m = json_to_module();
+
+    // mutation process
+    // 1. version
+    m.version = m.version + 1;
+
+    // 2. self_module_handle_idx
+    // m.self_module_handle_idx += 1;
+    // let mut rand_usize : usize = rand::thread_rng().gen(); // TableIndex = u16;
+    // let mutate_idx : usize = m.self_module_handle_idx.into_index() + rand_usize;
+    // println!("mutate_idx {:?}", mutate_idx);
+    let prev_val :u16 =  m.self_module_handle_idx.into_index().try_into().unwrap();
+    println!("prev value {:?}", prev_val);
+    m.self_module_handle_idx = ModuleHandleIndex( prev_val+ rand::thread_rng().gen_range(0..=65535));
+
+    // 3. module_handles
+    let mut rand_u16 : u16 = rand::thread_rng().gen();
+    let mut new_module_handle = ModuleHandle {
+        address: AddressIdentifierIndex(rand_u16),
+        name: IdentifierIndex(rand_u16),
+    };
+    // if m.module_handles.len() ==0 {
+    //     new_module_handle = ModuleHandle {
+    //         address: AddressIdentifierIndex(100),
+    //         name: IdentifierIndex(100),
+    //     }
+    // } else {
+    //     new_module_handle = m.module_handles[0];
+    //     new_module_handle.address += 10;
+    //     new_module_handle.name -= 10;
+    // }
+    m.module_handles.push(new_module_handle);
+
+    // 4. struct_handles
+    m.struct_handles.push(StructHandle {
+        module: ModuleHandleIndex(123),
+        name: IdentifierIndex(456),
+        abilities: AbilitySet(rand::thread_rng().gen_range(0..255)), // u8 0..=255
+        type_parameters: vec![],
+    });
+
+    // 5. function_handles
+    m.function_handles.push(FunctionHandle {
+        module: ModuleHandleIndex(10),
+        name: IdentifierIndex(m.identifiers.len() as u16),
+        parameters: SignatureIndex(20),
+        return_: SignatureIndex(30),
+        type_parameters: vec![],
+    });
+
+    // 6. field_handles
+    m.field_handles.push(FieldHandle {
+        owner: StructDefinitionIndex(333),
+        field: 4440,
+    });
+
+    // 7. friend_decls
+    rand_u16 = rand::thread_rng().gen();
+    let mut new_module_handle2 = ModuleHandle {
+        address: AddressIdentifierIndex(rand_u16),
+        name: IdentifierIndex(rand_u16),
+    };
+    // // new_module_handle.address += 100;
+    // new_module_handle.address = ModuleHandleIndex(
+    //     new_module_handle.address.into_index() + rand::thread_rng().gen());
+    //
+    // // new_module_handle.name -= 200;
+    // new_module_handle.name = IdentifierIndex(
+    //     new_module_handle.name.into_index() + rand::thread_rng().gen());
+
+    m.friend_decls.push(new_module_handle2);
+
+    // 8. struct_def_instantiations
+    m.struct_def_instantiations.push(StructDefInstantiation {
+        def: StructDefinitionIndex(12),
+        type_parameters: SignatureIndex(33),
+    });
+
+    // 9. function_instantiations
+    m.function_instantiations.push(FunctionInstantiation {
+        handle: FunctionHandleIndex(7878),
+        type_parameters: SignatureIndex(4545),
+    });
+
+    // 10. field_instantiations
+    m.field_instantiations.push(FieldInstantiation {
+        handle: FieldHandleIndex(3838),
+        type_parameters: SignatureIndex(21),
+    });
+
+    // 11. signatures
+    // Signature = Vec<SignatureToken>
+    let mut signature : Signature = Default::default();
+
+    let token1: SignatureToken = rand::random();
+    let token2: SignatureToken = rand::random();
+    signature.0.push(token1);
+    signature.0.push(token2);   // SignatureToken
+
+
+    m.signatures.push(signature);
+
+    // 12. identifiers
+    // pub struct Identifier(Box<str>);
+    m.identifiers.push(Identifier::new("Yunji".to_string()).unwrap());
+    // m.identifiers.push(Identifier::new("^_^*".to_string()).unwrap());
+    m.identifiers.push(Identifier::new("Hello".to_string()).unwrap());
+    m.identifiers.push(Identifier::new("Hello".to_string()).unwrap());
+
+
+    // 13. address_identifiers
+    // AccountAddress
+    // pub struct AccountAddress([u8; AccountAddress::LENGTH]);
+    let mut rng = rand::thread_rng();
+    let mut bytes = [0u8; AccountAddress::LENGTH];
+    rng.fill(&mut bytes);
+
+    let address = AccountAddress::new(bytes);
+    m.address_identifiers.push(address);
+    println!("address yj = {:?}", address);
+
+    // 14. constant_pool
+    // pub type ConstantPool = Vec<Constant>;
+    //pub struct Constant {
+    //     pub type_: SignatureToken,
+    //     pub data: Vec<u8>,
+    // }
+    let length = rand::thread_rng().gen_range(1..=500);
+    let random_data: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
+    m.constant_pool.push(Constant{
+        type_: rand::random(),
+        data: random_data,
+    });
+
+
+
+    // 15. metadata
+    // pub struct Metadata {
+    //     pub key: Vec<u8>,
+    //     pub value: Vec<u8>,
+    // }
+    let random_k: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
+    let random_v: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
+    m.metadata.push(Metadata {
+        key: random_k,
+        value: random_v,
+    });
+
+    // 16. struct_defs
+    let token3: SignatureToken = rand::random();
+    m.struct_defs.push(StructDefinition {
+        struct_handle: StructHandleIndex(rand::thread_rng().gen_range(0..=65535)),
+        field_information: StructFieldInformation::Declared(vec![FieldDefinition {
+            name: IdentifierIndex(m.identifiers.len() as u16),
+            signature: TypeSignature(token3),
+        }]),
+    });
+
+    // 17. function_defs
+    m.function_defs.push(FunctionDefinition {
+        function: FunctionHandleIndex(rand::thread_rng().gen_range(0..=65535)),
+        visibility: Visibility::Private,
+        is_entry: false,
+        acquires_global_resources: vec![],
+        code: Some(CodeUnit {
+            locals: SignatureIndex(rand::thread_rng().gen_range(0..=65535)),
+            code: vec![Bytecode::Ret],
+        }),
+    });
+
+
+    m
+}
+
+// pub fn arbitrary_module() -> CompiledModule {
+//
+// }
+
 // Need a custom implementation of Arbitrary because as of proptest-derive 0.1.1, the derivation
 // doesn't work for structs with more than 10 fields.
 #[cfg(any(test, feature = "fuzzing"))]
@@ -2174,210 +2394,6 @@ pub fn basic_test_module() -> CompiledModule {
 }
 
 /// my codes
-// yunji
-pub fn module_to_json(m: CompiledModule, n:usize) {
-    println!("module_to_json");
-
-    /// write CompileModule as Json
-    let json = serde_json::to_string_pretty(&m).expect("write json yj");
-    let mut file = File::create(format!("yj{:?}.json", n)).expect("cannot create file");
-    file.write_all(json.as_bytes()).expect("cannot write file");
-
-}
-
-pub fn json_to_module() -> CompiledModule {
-    println!("module from seed excuted@!!");
-
-    /// name of seed file. (assert(not directory, seed file)
-    let file_name = "/home/y23kim/rust/tutorial_move/seed/seed2.json";
-    // let contents = fs::read_to_string(file_name).expect("read seed file in file_format.rs");
-    // let data_vector: Vec<usize> = contents
-    //     .split_whitespace()
-    //     .map(|s| s.parse::<usize>().unwrap())
-    //     .collect();
-    let file = File::open(file_name).expect("Failed to open file");
-    let cm: CompiledModule = serde_json::from_reader(file).expect("Failed to deserialize");
-
-    println!("my CompiledModule {:?}", cm);
-    cm
-}
-
-pub fn mutate_module(m: &mut CompiledModule) -> &mut CompiledModule {
-// pub fn mutate_module() -> CompiledModule {
-//     let mut m = json_to_module();
-
-    // mutation process
-    // 1. version
-    m.version = m.version + 1;
-
-    // 2. self_module_handle_idx
-    // m.self_module_handle_idx += 1;
-    // let mut rand_usize : usize = rand::thread_rng().gen(); // TableIndex = u16;
-    // let mutate_idx : usize = m.self_module_handle_idx.into_index() + rand_usize;
-    // println!("mutate_idx {:?}", mutate_idx);
-    let prev_val :u16 =  m.self_module_handle_idx.into_index().try_into().unwrap();
-    println!("prev value {:?}", prev_val);
-    m.self_module_handle_idx = ModuleHandleIndex( prev_val+ rand::thread_rng().gen_range(0..=65535));
-
-    // 3. module_handles
-    let mut rand_u16 : u16 = rand::thread_rng().gen();
-    let mut new_module_handle = ModuleHandle {
-        address: AddressIdentifierIndex(rand_u16),
-        name: IdentifierIndex(rand_u16),
-    };
-    // if m.module_handles.len() ==0 {
-    //     new_module_handle = ModuleHandle {
-    //         address: AddressIdentifierIndex(100),
-    //         name: IdentifierIndex(100),
-    //     }
-    // } else {
-    //     new_module_handle = m.module_handles[0];
-    //     new_module_handle.address += 10;
-    //     new_module_handle.name -= 10;
-    // }
-    m.module_handles.push(new_module_handle);
-
-    // 4. struct_handles
-    m.struct_handles.push(StructHandle {
-        module: ModuleHandleIndex(123),
-        name: IdentifierIndex(456),
-        abilities: AbilitySet(rand::thread_rng().gen_range(0..255)), // u8 0..=255
-        type_parameters: vec![],
-    });
-
-    // 5. function_handles
-    m.function_handles.push(FunctionHandle {
-        module: ModuleHandleIndex(10),
-        name: IdentifierIndex(m.identifiers.len() as u16),
-        parameters: SignatureIndex(20),
-        return_: SignatureIndex(30),
-        type_parameters: vec![],
-    });
-
-    // 6. field_handles
-    m.field_handles.push(FieldHandle {
-        owner: StructDefinitionIndex(333),
-        field: 4440,
-    });
-
-    // 7. friend_decls
-    rand_u16 = rand::thread_rng().gen();
-    let mut new_module_handle2 = ModuleHandle {
-        address: AddressIdentifierIndex(rand_u16),
-        name: IdentifierIndex(rand_u16),
-    };
-    // // new_module_handle.address += 100;
-    // new_module_handle.address = ModuleHandleIndex(
-    //     new_module_handle.address.into_index() + rand::thread_rng().gen());
-    //
-    // // new_module_handle.name -= 200;
-    // new_module_handle.name = IdentifierIndex(
-    //     new_module_handle.name.into_index() + rand::thread_rng().gen());
-
-    m.friend_decls.push(new_module_handle2);
-
-    // 8. struct_def_instantiations
-    m.struct_def_instantiations.push(StructDefInstantiation {
-        def: StructDefinitionIndex(12),
-        type_parameters: SignatureIndex(33),
-    });
-
-    // 9. function_instantiations
-    m.function_instantiations.push(FunctionInstantiation {
-        handle: FunctionHandleIndex(7878),
-        type_parameters: SignatureIndex(4545),
-    });
-
-    // 10. field_instantiations
-    m.field_instantiations.push(FieldInstantiation {
-        handle: FieldHandleIndex(3838),
-        type_parameters: SignatureIndex(21),
-    });
-
-    // 11. signatures
-    // Signature = Vec<SignatureToken>
-    let mut signature : Signature = Default::default();
-
-    let token1: SignatureToken = rand::random();
-    let token2: SignatureToken = rand::random();
-    signature.0.push(token1);
-    signature.0.push(token2);   // SignatureToken
-
-
-    m.signatures.push(signature);
-
-    // 12. identifiers
-    // pub struct Identifier(Box<str>);
-    m.identifiers.push(Identifier::new("Yunji".to_string()).unwrap());
-    // m.identifiers.push(Identifier::new("^_^*".to_string()).unwrap());
-    m.identifiers.push(Identifier::new("Hello".to_string()).unwrap());
-    m.identifiers.push(Identifier::new("Hello".to_string()).unwrap());
-
-
-    // 13. address_identifiers
-    // AccountAddress
-    // pub struct AccountAddress([u8; AccountAddress::LENGTH]);
-    let mut rng = rand::thread_rng();
-    let mut bytes = [0u8; AccountAddress::LENGTH];
-    rng.fill(&mut bytes);
-
-    let address = AccountAddress::new(bytes);
-    m.address_identifiers.push(address);
-    println!("address yj = {:?}", address);
-
-    // 14. constant_pool
-    // pub type ConstantPool = Vec<Constant>;
-    //pub struct Constant {
-    //     pub type_: SignatureToken,
-    //     pub data: Vec<u8>,
-    // }
-    let length = rand::thread_rng().gen_range(1..=500);
-    let random_data: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
-    m.constant_pool.push(Constant{
-        type_: rand::random(),
-        data: random_data,
-    });
-
-
-
-    // 15. metadata
-    // pub struct Metadata {
-    //     pub key: Vec<u8>,
-    //     pub value: Vec<u8>,
-    // }
-    let random_k: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
-    let random_v: Vec<u8> = (0..length).map(|_| rand::thread_rng().gen()).collect();
-    m.metadata.push(Metadata {
-        key: random_k,
-        value: random_v,
-    });
-
-    // 16. struct_defs
-    let token3: SignatureToken = rand::random();
-    m.struct_defs.push(StructDefinition {
-        struct_handle: StructHandleIndex(rand::thread_rng().gen_range(0..=65535)),
-        field_information: StructFieldInformation::Declared(vec![FieldDefinition {
-            name: IdentifierIndex(m.identifiers.len() as u16),
-            signature: TypeSignature(token3),
-        }]),
-    });
-
-    // 17. function_defs
-    m.function_defs.push(FunctionDefinition {
-        function: FunctionHandleIndex(rand::thread_rng().gen_range(0..=65535)),
-        visibility: Visibility::Private,
-        is_entry: false,
-        acquires_global_resources: vec![],
-        code: Some(CodeUnit {
-            locals: SignatureIndex(rand::thread_rng().gen_range(0..=65535)),
-            code: vec![Bytecode::Ret],
-        }),
-    });
-
-
-    m
-}
-
 
 /// Return a simple script that contains only a return in the main()
 pub fn empty_script() -> CompiledScript {

@@ -24,6 +24,9 @@ pub mod proptest_types;
 pub mod serializer;
 pub mod views;
 
+pub mod fuzzer;
+pub mod builder;
+
 #[cfg(test)]
 mod unit_tests;
 
