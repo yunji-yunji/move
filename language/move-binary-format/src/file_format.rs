@@ -1954,7 +1954,7 @@ pub fn module_to_json(m: CompiledModule, n:usize) {
 }
 
 pub fn json_to_module() -> CompiledModule {
-    println!("module from seed excuted@!!");
+    println!("Json to module excuted@!!");
 
     /// name of seed file. (assert(not directory, seed file)
     let file_name = "/home/y23kim/rust/tutorial_move/seed/seed2.json";
@@ -1966,7 +1966,7 @@ pub fn json_to_module() -> CompiledModule {
     let file = File::open(file_name).expect("Failed to open file");
     let cm: CompiledModule = serde_json::from_reader(file).expect("Failed to deserialize");
 
-    println!("my CompiledModule {:?}", cm);
+    // println!("my CompiledModule {:?}", cm);
     cm
 }
 

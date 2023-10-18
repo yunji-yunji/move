@@ -286,7 +286,7 @@ impl Fuzzer{
                 println!("args and file name = {:?} {:?}", args, file_name);
         */
         let file_name = self.exec_path_file.clone();
-        // println!("file name {:?}", file_name.clone());
+        println!("file name {:?}", file_name.clone());
         // let file  = fs::File::open(file_name);
         let contents = fs::read_to_string(file_name)
             .expect("read file in fuzzer.rs");
